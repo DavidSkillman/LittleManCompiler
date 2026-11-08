@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
 	int line = 1;
 	int column = 0;
 
-	char ch = file.get();
+	unsigned char ch = file.get();
 	std::vector<Token> tokens;
 	while (ch != EOF) {
 		if (std::isalpha(ch)) {
