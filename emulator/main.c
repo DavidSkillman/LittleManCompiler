@@ -86,10 +86,10 @@ int main(int argc, char** argv) {
 #ifdef _WIN32
 				acc = _getch();
 #else
-				scanf_s("%c", &acc);
+				scanf("%c", &acc);
 #endif
 			}
-			else scanf_s("%hd", &acc);
+			else scanf("%hd", &acc);
 		}
 		else if (memory[i] == BASE * 9 + 2) { // OUT
 			printf("%hd\n", acc);
