@@ -85,14 +85,13 @@ int main(int argc, char** argv) {
 				i = (memory[i] % BASE) - 1;
 		}
 		else if (memory[i] == BASE * 9 + 1) { // INP
-			if (interactive) {
 #ifdef _WIN32
+			if (interactive)
 				acc = _getch();
+			else scanf_s("%hd", &acc);
 #else
-				scanf("%c", &acc);
+			scanf("%c", &acc);
 #endif
-			}
-			else scanf("%hd", &acc);
 		}
 		else if (memory[i] == BASE * 9 + 2) { // OUT
 			printf("%hd\n", acc);
