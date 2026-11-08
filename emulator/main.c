@@ -22,6 +22,8 @@ int main(int argc, char** argv) {
 			}
 			else if (!strcmp(argv[i], "-b")) {
 				++i;
+				if (i >= argc)
+					fputs("no base specified", stderr);
 				BASE = strtol(argv[i], NULL, 10);
 			}
 		}
