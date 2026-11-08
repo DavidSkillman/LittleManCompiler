@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
 	int line = 1;
 	int column = 0;
 
-	unsigned char ch = file.get();
+	int ch = file.get();
 	std::vector<Token> tokens;
 	while (ch != EOF) {
 		if (std::isalpha(ch)) {
@@ -134,8 +134,18 @@ int main(int argc, char** argv) {
 				ch = file.get();
 			}
 
-			Token token = { INTEGER, line, column, buf, std::stoi(buf) };
-			tokens.push_back(token);
+			try {
+				Token token = { INTEGER, line, column, buf, std::stoi(buf) };
+				tokens.push_back(token);
+			}
+			catch (const std::invalid_argument& e) {
+				std::cout << e.what() << "\n";
+				goto syntax_error;
+			}
+			catch (const std::out_of_range& e) {
+				std::cout << e.what() << "\n";
+				goto syntax_error;
+			}
 
 			column += buf.size();
 		}
@@ -153,6 +163,7 @@ int main(int argc, char** argv) {
 			ch = file.get();
 		}
 		else {
+		syntax_error:
 			printf("syntax error at line %d col %d\n", line, column);
 			file.close();
 			return 1;
