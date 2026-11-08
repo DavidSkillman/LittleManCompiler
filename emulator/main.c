@@ -13,7 +13,7 @@ int BASE = 100;
 
 int main(int argc, char** argv) {
 	char* input = NULL;
-	int interactive;
+	int interactive = 0;
 
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-') {
