@@ -1,3 +1,6 @@
+// Must be run with base 200 and -i -o
+// Made for Windows; may not work on other systems
+
 print   lda qstion
 		brz write
 		out
@@ -5,6 +8,8 @@ print   lda qstion
 		add one
 		sta print
 		bra print
+
+sets	sta name
 
 write	inp
 		sub ETX
@@ -16,41 +21,49 @@ write	inp
 		sub RIO
 		brz io
 		add IO
-
 		out
 
-rcurs	lda cursor
+		sta char
+
+		lda sets
+		add cursor
+		sta sets1
+
+		lda char
+sets1	sta name
+
+		lda cursor
 		add one
 		sta cursor
 		bra write
 
 end		hlt
 
+char	dat 0
+
+// Consume Windows IO input
 io		inp
-		
-		sub ILEFT
-		brz left
-		// sub RIRIGHT
-		// brz right
-
 		bra write
-
-left	lda cursor
-		brz write
-		lda BS
-		bra lcurs
 
 back	lda cursor
 		brz bell
+
+		lda cursor
+		sub one
+		sta cursor
+
+		add sets
+		sta sets2
+		sub sets2
+sets2	sta name
+
 		lda BS
 		out
 		lda SPC
 		out
-		bra left
+		lda BS
+		out
 
-lcurs	lda cursor
-		sub one
-		sta cursor
 		bra write
 
 bell	lda BEL
@@ -89,9 +102,6 @@ RCR		dat 5
 RIO		dat 211
 IO		dat 224
 
-ILEFT	dat 75
-RIRIGHT	dat 2
-
 BEL		dat 7
 BS		dat 8
 DEL		dat 127
@@ -122,7 +132,9 @@ qstion  dat 87
 		dat 32
 		dat 0
 
-answer1 dat 72
+answer1 dat 10
+		dat 10
+		dat 72
 		dat 101
 		dat 108
 		dat 108
@@ -158,4 +170,4 @@ answer2 dat 44
 		dat 63
 		dat 0
 
-name	dat 0
+name	dat	0
