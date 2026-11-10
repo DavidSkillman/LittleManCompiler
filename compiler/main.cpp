@@ -4,10 +4,9 @@
 #include <vector>
 #include <map>
 
-#define BASE 100
 #define BUFFER_SIZE 256
 
-#define TO_BASED(x) ((unsigned)(x + BASE * 10 - 1) % (BASE * 20 - 1)) - BASE * 10 + 1
+#define TO_BASED(x) ((unsigned)(x + base * 10 - 1) % (base * 20 - 1)) - base * 10 + 1
 
 enum TokenType {
 	LABEL, OPCODE, INTEGER, NEWLINE
@@ -22,15 +21,23 @@ struct Token {
 
 int main(int argc, char** argv) {
 	std::string input, output;
+	int base = 100;
 
 	if (argc > 1) {
 		for (int i = 1; i < argc; i++) {
 			if (!strcmp(argv[i], "-o")) {
 				++i;
 				if (i >= argc) {
-					break;
+					goto show_help;
 				}
 				output = argv[i];
+			}
+			else if (!strcmp(argv[i], "-b")) {
+				++i;
+				if (i >= argc) {
+					goto show_help;
+				}
+				base = std::stoi(argv[i]);
 			}
 			else if (!strcmp(argv[i], "-h")) {
 				goto show_help;
@@ -42,29 +49,24 @@ int main(int argc, char** argv) {
 	}
 	else {
 	show_help:
-		printf("usage: compiler input_file -o output_file [-h]\n");
+		printf("usage: compiler input_file -o output_file [-h] [-b BASE:100]\n");
 		return -1;
-	}
-
-	if (output.empty()) {
-		printf("no output file specified\n");
-		return 1;
 	}
 
 	std::map<std::string, int> opcodes = {
 		{"hlt", 0},
 		{"cob", 0},
 		{"dat", 0},
-		{"add", BASE * 1},
-		{"sub", BASE * 2},
-		{"sto", BASE * 3},
-		{"sta", BASE * 3},
-		{"lda", BASE * 5},
-		{"bra", BASE * 6},
-		{"brz", BASE * 7},
-		{"brp", BASE * 8},
-		{"inp", BASE * 9 + 1},
-		{"out", BASE * 9 + 2},
+		{"add", base * 1},
+		{"sub", base * 2},
+		{"sto", base * 3},
+		{"sta", base * 3},
+		{"lda", base * 5},
+		{"bra", base * 6},
+		{"brz", base * 7},
+		{"brp", base * 8},
+		{"inp", base * 9 + 1},
+		{"out", base * 9 + 2},
 	};
 
 	std::map<std::string, bool> with_operand = {
@@ -171,6 +173,11 @@ int main(int argc, char** argv) {
 			}
 			else {
 				goto syntax_error;
+			}
+		}
+		else if (ch == ';') {
+			while (ch != '\n' && ch != EOF) {
+				ch = file.get();
 			}
 		}
 		else {

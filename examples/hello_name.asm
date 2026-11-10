@@ -12,17 +12,18 @@ write	inp
 		sub RBS
 		brz back
 		sub RCR
-		brz end
+		brz wans1
 		sub RIO
 		brz io
 		add IO
 
 		out
 
-		lda ans_len
+rcurs	lda cursor
 		add one
-		sta ans_len
+		sta cursor
 		bra write
+
 end		hlt
 
 io		inp
@@ -34,27 +35,51 @@ io		inp
 
 		bra write
 
-left	lda BS
-		out
-		bra write
+left	lda cursor
+		brz write
+		lda BS
+		bra lcurs
 
-back	lda ans_len
+back	lda cursor
 		brz bell
 		lda BS
 		out
 		lda SPC
 		out
-		lda BS
-		out
+		bra left
 
-		lda ans_len
+lcurs	lda cursor
 		sub one
-		sta ans_len
+		sta cursor
 		bra write
 
 bell	lda BEL
 		out
 		bra write
+
+wans1	lda answer1
+		brz wname
+		out
+		lda wans1
+		add one
+		sta wans1
+		bra wans1
+
+wname	lda name
+		brz wans2
+		out
+		lda wname
+		add one
+		sta wname
+		bra wname
+
+wans2	lda answer2
+		brz end
+		out
+		lda wans2
+		add one
+		sta wans2
+		bra wans2
 
 CR		dat 13
 
@@ -72,7 +97,7 @@ BS		dat 8
 DEL		dat 127
 SPC		dat 32
 
-ans_len	dat 0
+cursor	dat 0
 one		dat 1
 
 qstion  dat 87
@@ -96,3 +121,41 @@ qstion  dat 87
 		dat 62
 		dat 32
 		dat 0
+
+answer1 dat 72
+		dat 101
+		dat 108
+		dat 108
+		dat 111
+		dat 32
+		dat 116
+		dat 104
+		dat 101
+		dat 114
+		dat 101
+		dat 32
+		dat 0
+
+answer2 dat 44
+		dat 32
+		dat 104
+		dat 111
+		dat 119
+		dat 32
+		dat 97
+		dat 114
+		dat 101
+		dat 32
+		dat 121
+		dat 111
+		dat 117
+		dat 32
+		dat 100
+		dat 111
+		dat 105
+		dat 110
+		dat 103
+		dat 63
+		dat 0
+
+name	dat 0

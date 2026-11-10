@@ -8,14 +8,13 @@
 
 #define MEMORY_SIZE 0x10000
 
-int BASE = 100;
-
-#define TO_BASED(x) ((unsigned)(x + BASE * 10 - 1) % (BASE * 20 - 1)) - BASE * 10 + 1
+#define TO_BASED(x) ((unsigned)(x + base * 10 - 1) % (base * 20 - 1)) - base * 10 + 1
 
 int main(int argc, char** argv) {
 	char* input = NULL;
 	int interactive = 0;
 	int character_output = 0;
+	int base = 100;
 
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-') {
@@ -29,7 +28,7 @@ int main(int argc, char** argv) {
 				++i;
 				if (i >= argc)
 					fputs("no base specified", stderr);
-				else BASE = strtol(argv[i], NULL, 10);
+				else base = strtoul(argv[i], NULL, 10);
 			}
 		}
 		else {
@@ -57,38 +56,38 @@ int main(int argc, char** argv) {
 	for (int i = 0; i < bytesRead; i++) {
 		acc = TO_BASED(acc);
 		
-		int address = memory[i] % BASE;
+		int address = memory[i] % base;
 		int read = TO_BASED(memory[address]);
-		if (memory[i] < BASE) { // HLT
+		if (memory[i] < base) { // HLT
 			break;
 		}
-		else if (memory[i] < BASE * 2) { // ADD
+		else if (memory[i] < base * 2) { // ADD
 			acc += read;
 		}
-		else if (memory[i] < BASE * 3) { // SUB
+		else if (memory[i] < base * 3) { // SUB
 			acc -= read;
 		}
-		else if (memory[i] < BASE * 4) { // STO
+		else if (memory[i] < base * 4) { // STO
 			memory[address] = acc;
 		}
-		else if (memory[i] < BASE * 5) { 
+		else if (memory[i] < base * 5) { 
 			goto bad;
 		}
-		else if (memory[i] < BASE * 6) { // LDA
+		else if (memory[i] < base * 6) { // LDA
 			acc = read;
 		}
-		else if (memory[i] < BASE * 7) { // BRA
-			i = (memory[i] % BASE) - 1;
+		else if (memory[i] < base * 7) { // BRA
+			i = (memory[i] % base) - 1;
 		}
-		else if (memory[i] < BASE * 8) { // BRZ
+		else if (memory[i] < base * 8) { // BRZ
 			if (acc == 0)
-				i = (memory[i] % BASE) - 1;
+				i = (memory[i] % base) - 1;
 		}
-		else if (memory[i] < BASE * 9) { // BRP
+		else if (memory[i] < base * 9) { // BRP
 			if (acc >= 0)
-				i = (memory[i] % BASE) - 1;
+				i = (memory[i] % base) - 1;
 		}
-		else if (memory[i] == BASE * 9 + 1) { // INP
+		else if (memory[i] == base * 9 + 1) { // INP
 			int scano = 1;
 #ifdef _WIN32
 			if (interactive)
@@ -104,7 +103,7 @@ int main(int argc, char** argv) {
 				goto end;
 			}
 		}
-		else if (memory[i] == BASE * 9 + 2) { // OUT
+		else if (memory[i] == base * 9 + 2) { // OUT
 			if (character_output)
 				fputc(acc, stdout);
 			else printf("%hd\n", acc);
