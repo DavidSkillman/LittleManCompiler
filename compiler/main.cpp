@@ -197,7 +197,6 @@ int main(int argc, char** argv) {
 
 		switch (tokens[i].type) {
 		case LABEL:
-			std::cout << "LABEL" << std::endl;
 			if (expected_value) { // Usage
 				expected_value = false;
 				expected_newline = true;
@@ -209,7 +208,6 @@ int main(int argc, char** argv) {
 			}
 			break;
 		case OPCODE:
-			std::cout << "OPCODE" << std::endl;
 			expected_opcode = false;
 
 			// If they aren't the I/O interrupts or HLT instruction, we expect a value
@@ -217,12 +215,10 @@ int main(int argc, char** argv) {
 			++virtual_pc;
 			break;
 		case INTEGER:
-			std::cout << "INTEGER" << std::endl;
 			expected_value = false;
 			expected_newline = true;
 			break;
 		case NEWLINE:
-			std::cout << "NEWLINE" << std::endl;
 			expected_newline = false;
 			tokens.erase(tokens.begin() + i--);
 		}
