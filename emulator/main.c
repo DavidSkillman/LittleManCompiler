@@ -15,11 +15,15 @@ int BASE = 100;
 int main(int argc, char** argv) {
 	char* input = NULL;
 	int interactive = 0;
+	int character_output = 0;
 
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-') {
-			if (!strcmp(argv[i], "-i")) {
+			if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--interactive")) {
 				interactive = 1;
+			}
+			if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--character-output")) {
+				character_output = 1;
 			}
 			else if (!strcmp(argv[i], "-b")) {
 				++i;
@@ -85,19 +89,25 @@ int main(int argc, char** argv) {
 				i = (memory[i] % BASE) - 1;
 		}
 		else if (memory[i] == BASE * 9 + 1) { // INP
+			int scano = 1;
 #ifdef _WIN32
 			if (interactive)
 				acc = _getch();
-			else scanf_s("%hd", &acc);
+			else scano = scanf_s("%hd", &acc);
 #else
-			scanf("%c", &acc);
+			if (interactive)
+				scano = scanf("%c", &acc);
+			else scano = scanf("%hd", &acc);
 #endif
+			if (scano != 1) {
+				fputs("input error or end of file", stderr);
+				goto end;
+			}
 		}
 		else if (memory[i] == BASE * 9 + 2) { // OUT
-			printf("%hd\n", acc);
-		}
-		else if (memory[i] == BASE * 9 + 22) { // OTC
-			fputc(acc, stdout);
+			if (character_output)
+				fputc(acc, stdout);
+			else printf("%hd\n", acc);
 		}
 		else {
 		bad:

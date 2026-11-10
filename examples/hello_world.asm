@@ -1,6 +1,6 @@
 print	lda string
 		brz end
-        otc
+        out
 		lda print
 		add one
 		sta print

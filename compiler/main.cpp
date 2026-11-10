@@ -17,7 +17,7 @@ struct Token {
 	TokenType type;
 	int line = 0, column = 0;
 	std::string name = "";
-	int value = -1;
+	unsigned short value = 0;
 };
 
 int main(int argc, char** argv) {
@@ -53,6 +53,7 @@ int main(int argc, char** argv) {
 
 	std::map<std::string, int> opcodes = {
 		{"hlt", 0},
+		{"cob", 0},
 		{"dat", 0},
 		{"add", BASE * 1},
 		{"sub", BASE * 2},
@@ -64,11 +65,11 @@ int main(int argc, char** argv) {
 		{"brp", BASE * 8},
 		{"inp", BASE * 9 + 1},
 		{"out", BASE * 9 + 2},
-		{"otc", BASE * 9 + 22},
 	};
 
 	std::map<std::string, bool> with_operand = {
 		{"hlt", false},
+		{"cob", false},
 		{"dat", true},
 		{"add", true},
 		{"sub", true},
@@ -80,7 +81,6 @@ int main(int argc, char** argv) {
 		{"brp", true},
 		{"inp", false},
 		{"out", false},
-		{"otc", false},
 	};
 
 	std::ifstream file(input);
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	std::ofstream output_file(output);
+	std::ofstream output_file(output, std::ios::binary);
 	if (!output_file.good()) {
 		fputs("could not open output file\n", stderr);
 		return 1;
@@ -177,7 +177,7 @@ int main(int argc, char** argv) {
 	bool expected_newline = false;
 
 	int virtual_pc = 0;
-	std::map<std::string, int> labels;
+	std::map<std::string, short> labels;
 	for (size_t i = 0; i < tokens.size(); i++) {
 		if (expected_opcode && tokens[i].type != OPCODE) {
 			printf("expected OPCODE at line %d col %d\n", tokens[i].line, tokens[i].column);
@@ -197,6 +197,7 @@ int main(int argc, char** argv) {
 
 		switch (tokens[i].type) {
 		case LABEL:
+			std::cout << "LABEL" << std::endl;
 			if (expected_value) { // Usage
 				expected_value = false;
 				expected_newline = true;
@@ -208,26 +209,28 @@ int main(int argc, char** argv) {
 			}
 			break;
 		case OPCODE:
+			std::cout << "OPCODE" << std::endl;
 			expected_opcode = false;
 
 			// If they aren't the I/O interrupts or HLT instruction, we expect a value
-			if (with_operand[tokens[i].name])
-				expected_value = true;
+			expected_value = with_operand[tokens[i].name];
 			++virtual_pc;
 			break;
 		case INTEGER:
+			std::cout << "INTEGER" << std::endl;
 			expected_value = false;
 			expected_newline = true;
 			break;
 		case NEWLINE:
+			std::cout << "NEWLINE" << std::endl;
 			expected_newline = false;
 			tokens.erase(tokens.begin() + i--);
 		}
 	}
 
-	std::vector<uint16_t> instructions;
+	std::vector<short> instructions;
 	for (size_t i = 0; i < tokens.size(); i++) {
-		uint16_t instruction = tokens[i].value;
+		short instruction = tokens[i].value;
 
 		if (!with_operand[tokens[i].name])
 			goto finish_instruction;
@@ -248,7 +251,7 @@ int main(int argc, char** argv) {
 	}
 
 	if (!error) {
-		output_file.write((const char*)instructions.data(), instructions.size() * sizeof(uint16_t));
+		output_file.write((const char*)instructions.data(), instructions.size() * sizeof(short));
 		output_file.close();
 
 		printf("written to %s\n", output.c_str());
