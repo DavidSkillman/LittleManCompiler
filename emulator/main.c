@@ -42,10 +42,10 @@ int main(int argc, char** argv) {
 	}
 
 	FILE* file = fopen(input, "rb");
-    if (!file) {
-        fputs("input file does not exist", stderr);
+	if (!file) {
+		fputs("input file does not exist", stderr);
 		goto end;
-    }
+	}
 
 	fread(&base, sizeof(short), 1, file);
 	fread(&flags, sizeof(short), 1, file);
