@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
 			std::string buf;
 			std::string lbuf;
 
-			while (std::isalnum(ch)) {
+			while (!std::isspace(ch)) {
 				buf += ch;
 				lbuf += std::tolower(ch);
 				ch = file.get();
@@ -161,6 +161,17 @@ int main(int argc, char** argv) {
 				++column;
 			}
 			ch = file.get();
+		}
+		else if (ch == '/') {
+			ch = file.get();
+			if (ch == '/') {
+				while (ch != '\n' && ch != EOF) {
+					ch = file.get();
+				}
+			}
+			else {
+				goto syntax_error;
+			}
 		}
 		else {
 		syntax_error:
