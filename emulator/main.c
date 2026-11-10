@@ -6,19 +6,19 @@
 #include <conio.h>
 #endif
 
-#define MEMORY_SIZE 0x10000
+#define INTERACTIVE 0b01
+#define OUTPUT_CHAR 0b10
 
 #define TO_BASED(x) ((unsigned)(x + base * 10 - 1) % (base * 20 - 1)) - base * 10 + 1
 
 int main(int argc, char** argv) {
 	char* input = NULL;
-	int interactive = 0;
-	int character_output = 0;
+	int flags = 0;
 	int base = 100;
 
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-') {
-			if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--interactive")) {
+			/*if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--interactive")) {
 				interactive = 1;
 			}
 			if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--character-output")) {
@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 				if (i >= argc)
 					fputs("no base specified", stderr);
 				else base = strtoul(argv[i], NULL, 10);
-			}
+			}*/
 		}
 		else {
 			input = argv[i];
@@ -41,15 +41,17 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	short* memory = calloc(sizeof(short), MEMORY_SIZE);
-
 	FILE* file = fopen(input, "rb");
     if (!file) {
         fputs("input file does not exist", stderr);
 		goto end;
     }
 
-	size_t bytesRead = fread(memory, sizeof(short), MEMORY_SIZE, file);
+	fread(&base, sizeof(short), 1, file);
+	fread(&flags, sizeof(short), 1, file);
+
+	short* memory = calloc(sizeof(short), base);
+	size_t bytesRead = fread(memory, sizeof(short), base, file);
 	fclose(file);
 
 	short acc = 0;
@@ -90,11 +92,11 @@ int main(int argc, char** argv) {
 		else if (memory[i] == base * 9 + 1) { // INP
 			int scano = 1;
 #ifdef _WIN32
-			if (interactive)
+			if (flags & INTERACTIVE)
 				acc = _getch();
 			else scano = scanf_s("%hd", &acc);
 #else
-			if (interactive)
+			if (flags & INTERACTIVE)
 				scano = scanf("%c", &acc);
 			else scano = scanf("%hd", &acc);
 #endif
@@ -104,7 +106,7 @@ int main(int argc, char** argv) {
 			}
 		}
 		else if (memory[i] == base * 9 + 2) { // OUT
-			if (character_output)
+			if (flags & OUTPUT_CHAR)
 				fputc(acc, stdout);
 			else printf("%hd\n", acc);
 		}

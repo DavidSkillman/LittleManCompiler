@@ -41,7 +41,7 @@ end		hlt
 
 char	dat 0
 
-// Consume Windows IO input
+// Consume IO input
 io		inp
 		bra write
 

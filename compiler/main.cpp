@@ -5,6 +5,8 @@
 #include <map>
 
 #define BUFFER_SIZE 256
+#define INTERACTIVE 0b01
+#define OUTPUT_CHAR 0b10
 
 #define TO_BASED(x) ((unsigned)(x + base * 10 - 1) % (base * 20 - 1)) - base * 10 + 1
 
@@ -22,24 +24,31 @@ struct Token {
 int main(int argc, char** argv) {
 	std::string input, output;
 	int base = 100;
+	short flags = 0;
 
 	if (argc > 1) {
 		for (int i = 1; i < argc; i++) {
-			if (!strcmp(argv[i], "-o")) {
+			if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--output")) {
 				++i;
 				if (i >= argc) {
 					goto show_help;
 				}
 				output = argv[i];
 			}
-			else if (!strcmp(argv[i], "-b")) {
+			else if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "--base")) {
 				++i;
 				if (i >= argc) {
 					goto show_help;
 				}
 				base = std::stoi(argv[i]);
 			}
-			else if (!strcmp(argv[i], "-h")) {
+			else if (!strcmp(argv[i], "-I") || !strcmp(argv[i], "--interactive")) {
+				flags |= INTERACTIVE;
+			}
+			else if (!strcmp(argv[i], "-O") || !strcmp(argv[i], "--output-characters")) {
+				flags |= OUTPUT_CHAR;
+			}
+			else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 				goto show_help;
 			}
 			else {
@@ -49,7 +58,7 @@ int main(int argc, char** argv) {
 	}
 	else {
 	show_help:
-		printf("usage: compiler input_file -o output_file [-h] [-b BASE:100]\n");
+		printf("usage: compiler input_file <-o --output> output_file.lmc [-h --help] [-b --base BASE:100] [-I --interactive] [-O --output-characters]\n");
 		return -1;
 	}
 
@@ -243,6 +252,9 @@ int main(int argc, char** argv) {
 	}
 
 	std::vector<short> instructions;
+	instructions.push_back(base);
+	instructions.push_back(flags);
+
 	for (size_t i = 0; i < tokens.size(); i++) {
 		short instruction = tokens[i].value;
 
