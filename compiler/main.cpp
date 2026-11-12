@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 	else {
 	show_help:
 		printf("usage: compiler input_file <-o --output> output_file.lmc [-h --help] [-b --base BASE:100] [-I --interactive] [-O --output-characters]\n");
-		return -1;
+		return 1;
 	}
 
 	std::map<std::string, unsigned short> opcodes = {
