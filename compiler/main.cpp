@@ -23,7 +23,7 @@ struct Token {
 
 int main(int argc, char** argv) {
 	std::string input, output;
-	int base = 100;
+	unsigned short base = 100;
 	short flags = 0;
 
 	if (argc > 1) {
@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 				if (i >= argc) {
 					goto show_help;
 				}
-				base = std::stoi(argv[i]);
+				base = static_cast<unsigned short>(std::stoi(argv[i]));
 			}
 			else if (!strcmp(argv[i], "-I") || !strcmp(argv[i], "--interactive")) {
 				flags |= INTERACTIVE;
@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
-	std::map<std::string, int> opcodes = {
+	std::map<std::string, unsigned short> opcodes = {
 		{"hlt", 0},
 		{"cob", 0},
 		{"dat", 0},
@@ -146,7 +146,7 @@ int main(int argc, char** argv) {
 			}
 
 			try {
-				Token token = { INTEGER, line, column, buf, std::stoi(buf) };
+				Token token = { INTEGER, line, column, buf, static_cast<unsigned short>(std::stoi(buf)) };
 				tokens.push_back(token);
 			}
 			catch (const std::invalid_argument& e) {
